@@ -1,5 +1,7 @@
 import { createApp } from 'vue'
 import ElementPlus from 'element-plus';
+import * as Sentry from "@sentry/vue";
+import { BrowserTracing } from "@sentry/tracing";
 
 // 引入公共样式
 import 'element-plus/lib/theme-chalk/index.css';
@@ -18,6 +20,34 @@ import store from './store/index'
 // import compontents from './components/index'
 
 const app = createApp(App);
+
+// https://sentry.io/organizations/abunuo/projects/
+Sentry.init({
+  app,
+  dsn: "https://847eb8b040cf4459a91407617c6d122a@o1306347.ingest.sentry.io/6548788",
+  enabled: import.meta.env.MODE === "production",
+  environment: import.meta.env.MODE,
+  integrations: [
+    new BrowserTracing({
+      routingInstrumentation: Sentry.vueRouterInstrumentation(route),
+      tracingOrigins: ["localhost"],
+    }),
+  ],
+  beforeSend(event, hint) {
+    console.log(event)
+    // Check if it is an exception, and if so, show the report dialog
+    // if (event.exception) {
+    //   Sentry.showReportDialog({ eventId: event.event_id });
+    // }
+    return event;
+  },
+  release: "1.0.0",
+  // Set tracesSampleRate to 1.0 to capture 100%
+  // of transactions for performance monitoring.
+  // We recommend adjusting this value in production
+  tracesSampleRate: 1.0,
+});
+
 app
   .use(route)
   .use(store)

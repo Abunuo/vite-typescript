@@ -4,6 +4,7 @@ node_modules
 dist
 dist-ssr
 package-lock.json
+yarn.lock
 
 # local env files
 *.local
